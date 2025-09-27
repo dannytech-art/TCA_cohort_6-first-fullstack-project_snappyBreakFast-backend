@@ -88,3 +88,48 @@ exports.verifyOtp = async (req,res)=>{
         })
     }
 }
+exports.resendOtp = async (req,res)=>{
+    try {
+        const decodedId = req.user.id
+        const user = await userModel.findById(decodedId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+            if (user.isVerified) {
+                return res.status(400).json({ message: "User already verified" });
+            }
+        
+            if(user.otp && user.otpExpiry > Date.now()){
+                return res.status(400).json({ message: `You can only request for a new OTP after the current one expires`})
+            }   
+
+        user.otp = otp
+        user.otpExpiry = expiresAt
+        await user.save()
+        user.isVerified = true
+        otp = null
+        otpExpiry =null
+        const token = jwt.sign({
+            id: user._id,
+            email: user.email
+        },process.env.JWT_SECRET)
+
+        const emailOption = {
+            email: user.email,
+            subject: 'Verify your email',
+            html: signUpTemp(otp, user.firstName)
+        }       
+        await emailSender(emailOption)
+        res.status(200).json({
+            message: `OTP resent successfully`,
+            data: user,
+            token
+        })
+        
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })    
+    }
+}
