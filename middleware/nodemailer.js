@@ -1,28 +1,33 @@
 const nodemailer = require("nodemailer");
 
-const emailSender  = async (options)=>{
-    // Create a test account or replace with real credentials.
-const transporter = nodemailer.createTransport({
-  service: process.env.SERVICE,
-  host: process.env.MAIL_HOST,
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.APP_USER,
-    pass: process.env.APP_PASSWORD,
-  },
-});
+const emailSender = async (options) => {
+  try {
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: process.env.SERVICE,      // e.g., "Gmail"
+      host: process.env.MAIL_HOST,       // e.g., "smtp.gmail.com"
+      port: 587,
+      secure: false,                     // true for 465, false for 587
+      auth: {
+        user: process.env.APP_USER,      // your verified email
+        pass: process.env.APP_PASSWORD,  // app password for Gmail
+      },
+    });
 
-// Wrap in an async IIFE so we can use await.
-(async () => {
-  const info = await transporter.sendMail({
-    from: `"SnapBreakfast" <${process.env.USER}>`,
-    to: options.email,
-    subject: options.subject, // plain‑text body
-    html: options.html, // HTML body
-  });
+    // Send email
+    const info = await transporter.sendMail({
+      from: `"SnapBreakfast" <${process.env.APP_USER}>`, // corrected from process.env.USER
+      to: options.email,
+      subject: options.subject,
+      html: options.html,
+    });
 
-  console.log("Message sent:", info.messageId);
-})();
-}
-module.exports = emailSender
+    console.log("Email sent successfully:", info.messageId);
+    return info;
+  } catch (err) {
+    console.error("Failed to send email:", err);
+    throw err;  // re-throw so caller can handle it
+  }
+};
+
+module.exports = emailSender;
