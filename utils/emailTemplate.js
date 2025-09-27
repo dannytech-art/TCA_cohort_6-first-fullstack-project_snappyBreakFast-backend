@@ -6,7 +6,7 @@ const signUpTemp =(verificationCode,firstName)=>{
   <meta charset="UTF-8">
   <title>SnapBreakfast Verification</title>
 </head>
-<body style="margin:0; padding:0; background-color:rgb(255,192,66); font-family: Arial, sans-serif;">
+<body style="margin:0; padding:0; background-color:rgba(255, 255, 255, 1); font-family: Arial, sans-serif;">
 
   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
@@ -16,7 +16,8 @@ const signUpTemp =(verificationCode,firstName)=>{
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background:#fff; border:2px solid black; border-radius:6px; padding:40px;">
           <tr>
             <td align="center" style="padding-bottom:20px;">
-              <h1 style="color:green; margin:0; font-size:28px;">SnapBreakfast</h1>
+              <!-- Replace heading with logo -->
+              <img src="https://res.cloudinary.com/djxoqpt9t/image/upload/v1758924386/snapbreakfast_logo_qyuo5n.png" alt="SnapBreakfast Logo" width="250" style="display:block; margin:0 auto;"/>
             </td>
           </tr>
           <tr>
@@ -33,7 +34,7 @@ const signUpTemp =(verificationCode,firstName)=>{
           </tr>
           <tr>
             <td style="padding-top:20px; font-size:14px; color:#555;">
-              <p style="margin:0;"><strong>Please don’t share this code with anyone:</strong> SnapBreakfast will never ask for it on the phone or via email.</p>
+              <p style="margin:0;"><strong>Please don't share this code with anyone:</strong> SnapBreakfast will never ask for it on the phone or via email.</p>
             </td>
           </tr>
           <tr>
