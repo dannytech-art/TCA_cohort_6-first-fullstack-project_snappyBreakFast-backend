@@ -5,10 +5,13 @@ const userRouter = require('./routes/userRouter');
 
 const app = express();
 
-// ✅ CORS setup (must be before your routes)
+// ✅ CORS setup
 app.use(cors({
-  origin: "http://localhost:5173",  // frontend dev server
-  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  origin: [
+    "http://localhost:5173",             // local dev
+    "https://your-frontend.vercel.app"   // deployed frontend
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
