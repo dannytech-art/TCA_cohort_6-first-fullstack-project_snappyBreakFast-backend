@@ -4,7 +4,7 @@ const { signUpValidator } = require('../middleware/validator')
 
 const router = require('express').Router()
 
-router.post('/user/signup',signUpValidator, signup)
+router.post('/user/signup', signup)
 
 router.post('/user/otp', authenticate , verifyOtp)
 
