@@ -15,11 +15,11 @@ const foodSchema = new mongoose.Schema({
   image: {
     url: {  
         type: String,
-        require: true
+        required: true
     },
     publicId: {
         type: String,
-        require: true
+        required: true
     }
   },
   restaurantId: {
