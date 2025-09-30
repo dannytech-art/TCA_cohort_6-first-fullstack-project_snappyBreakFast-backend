@@ -54,52 +54,42 @@ exports.signup = async (req,res)=> {
         })
     }
 }
-exports.verifyOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body; // frontend sends both
+exports.verifyOtp = async (req,res)=>{
+    try {
+        const { otp } = req.body
+        const decodedId = req.user.id
+        const user = await userModel.findById(decodedId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        if (user.otp !== String(otp)) {
+            return res.status(400).json({ message: "Invalid OTP" });
+        }
+        if (Date.now() > user.otpExpiry) {
+            return res.status(400).json({ message: `OTP expired`})
+        }
+        
+        user.isVerified = true
+        user.otp = null
+        user.otpExpiry = null
+        await user.save()
+        const token = jwt.sign({
+            id: user._id,
+            email: user.email
+        },process.env.JWT_SECRET,{expiresIn: '1d'})
 
-    if (!email || !otp) {
-      return res.status(400).json({ message: "Email and OTP are required" });
+        res.status(200).json({
+            message: `Account verified successfully`,
+            data: user,
+            token
+
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
     }
-
-    const user = await userModel.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // 1. Check expiry first
-    if (Date.now() > user.otpExpiry) {
-      return res.status(400).json({ message: "OTP expired" });
-    }
-
-    // 2. Then check value
-    if (String(user.otp) !== String(otp)) {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    // 3. Mark verified
-    user.isVerified = true;
-    user.otp = null;
-    user.otpExpiry = null;
-    await user.save();
-
-    // 4. Generate JWT
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    res.status(200).json({
-      message: "Account verified successfully",
-      user,
-      token,
-    });
-  } catch (error) {
-    console.error("OTP verification error:", error);
-    res.status(500).json({ message: error.message });
-  }
-};
+}
 exports.resendOtp = async (req, res) => {
   try {
     const decodedId = req.user.id;
