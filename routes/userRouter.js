@@ -6,7 +6,7 @@ const router = require('express').Router()
 
 router.post('/user/signup', signup)
 
-router.post('/user/otp', authenticate , verifyOtp)
+router.post('/user/otp', verifyOtp)
 
 router.post('/user/resend-otp', authenticate , resendOtp)
 

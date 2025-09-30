@@ -54,42 +54,51 @@ exports.signup = async (req,res)=> {
         })
     }
 }
-exports.verifyOtp = async (req,res)=>{
-    try {
-        const { otp } = req.body
-        const decodedId = req.user.id
-        const user = await userModel.findById(decodedId);
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-        if (user.otp !== String(otp)) {
-            return res.status(400).json({ message: "Invalid OTP" });
-        }
-        if (Date.now() > user.otpExpiry) {
-            return res.status(400).json({ message: `OTP expired`})
-        }
-        
-        user.isVerified = true
-        user.otp = null
-        user.otpExpiry = null
-        await user.save()
-        const token = jwt.sign({
-            id: user._id,
-            email: user.email
-        },process.env.JWT_SECRET,{expiresIn: '1d'})
 
-        res.status(200).json({
-            message: `Account verified successfully`,
-            data: user,
-            token
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
 
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
     }
-}
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (user.otp !== String(otp)) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (Date.now() > user.otpExpiry) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    //Verification successful
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpiry = null;
+    await user.save();
+
+    // Generate auth token after verification
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return res.status(200).json({
+      message: "Account verified successfully",
+      user: { id: user._id, email: user.email },
+      token,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 exports.resendOtp = async (req, res) => {
   try {
     const decodedId = req.user.id;
