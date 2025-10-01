@@ -1,19 +1,19 @@
-const resturantmodel = require("../models/resturantModel");
+const restaurantmodel = require("../models/restaurantModel");
 const cloudinary = require("../config/cloudinary");
 const fs = require('fs');
 // Create a new restaurant
-exports.createResturant = async (req, res) => {
+exports.createRestaurant = async (req, res) => {
     try {
         const { name, description, time } = req.body;
         const file = req.file;
 
-        const existingResturant = await resturantmodel.findOne({ name });
-        if (existingResturant) {
+        const existingRestaurant = await restaurantmodel.findOne({ name });
+        if (existingRestaurant) {
           return res.status(400).json({ message: "Restaurant already exists" });
         }
          
        const cloudImage = await cloudinary.uploader.upload(file.path, {
-        folder: 'SnapBreakfast/Resturant',
+        folder: 'SnapBreakfast/Restaurant',
         use_filename: true,
         transformation: [
         { width: 500, height: 250, crop: "fill", gravity: "auto" }
@@ -29,16 +29,16 @@ exports.createResturant = async (req, res) => {
         }
     
         
-        const resturant = new resturantmodel({
+        const retaturant = new restaurantmodel({
             name,
             description,
             time,
             coverImage: Image
         });
-        await resturant.save();
+        await restaurant.save();
         res.status(201).json({
-            message: `Resturant created successfully`,
-            data: resturant
+            message: `Restaurant created successfully`,
+            data: restaurant
         });
     } catch (error) {
         res.status(500).json({
@@ -46,11 +46,11 @@ exports.createResturant = async (req, res) => {
         })
     }
 };
-exports.getAllResturants = async (req, res) => {
+exports.getAllRestaurants = async (req, res) => {
     try {
-        const resturants = await resturantmodel.find().populate('foodIds');
+        const resturants = await restaurantmodel.find().populate('foodIds');
         res.status(200).json({
-            message: 'Resturants fetched successfully',
+            message: 'Restaurants fetched successfully',
             data: resturants
         });
     } catch (error) {
@@ -59,3 +59,12 @@ exports.getAllResturants = async (req, res) => {
         })
     }   
 };
+exports.getRestaurantById = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
