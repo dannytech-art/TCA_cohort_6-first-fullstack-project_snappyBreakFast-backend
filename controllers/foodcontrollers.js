@@ -1,6 +1,6 @@
 const Foodmodel = require('../models/foodmodel');
 const cloudinary = require('../config/cloudinary');
-const resturantmodel = require('../models/resturantModel');
+const resturantmodel = require('../models/restaurantModel');
 
 // Helper to upload from memory buffer
 function uploadToCloudinary(fileBuffer) {
