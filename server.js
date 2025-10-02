@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://snap-break-fast-webapp-3f7nsa27q-zions-projects-73290082.vercel.app/"],
+    origin: ["http://localhost:5173", "https://snap-break-fast-webapp.vercel.app/"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
