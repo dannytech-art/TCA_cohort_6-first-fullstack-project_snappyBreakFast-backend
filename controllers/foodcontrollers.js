@@ -171,3 +171,17 @@ exports.deleteFood = async (req, res) => {
         });
     }
 };
+exports.getFoodByRestaurant = async (req, res) => {
+    try {
+        const { restaurantId } = req.params;
+        const foods = await Foodmodel.find({ restaurantId }).populate('restaurantId');
+        res.status(200).json({
+            message: "Food items fetched successfully",
+            data: foods
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+}
