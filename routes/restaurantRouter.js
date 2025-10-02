@@ -1,4 +1,4 @@
-const { createRestaurant, getAllRestaurants } = require('../controllers/restaurantcontroller')
+const { createRestaurant, getAllRestaurants, getRestaurantById } = require('../controllers/restaurantcontroller')
 const upload = require('../middleware/multer')
 const router = require('express').Router()
 
