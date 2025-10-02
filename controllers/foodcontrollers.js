@@ -3,7 +3,7 @@ const cloudinary = require('../config/cloudinary');
 const resturantmodel = require('../models/restaurantModel');
 
 // Helper to upload from memory buffer
-function uploadToCloudinary(fileBuffer) {
+const uploadToCloudinary = (fileBuffer)=> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
@@ -75,4 +75,99 @@ exports.createFood = async (req, res) => {
       message: error.message
     });
   }
+};
+
+// Get all food items
+exports.getAllFoods = async (req, res) => {
+  try {
+    const foods = await Foodmodel.find().populate('restaurantId');
+    res.status(200).json({
+      message: 'Food items fetched successfully',
+      data: foods
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  } 
+};
+// Get food item by ID
+exports.getFoodById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const food = await Foodmodel.findById(id).populate('restaurantId');
+    if (!food) {
+      return res.status(404).json({ message: "Food item not found" });
+    }       
+    res.status(200).json({
+      message: 'Food item fetched successfully',
+      data: food
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+// update food item
+exports.updateFood = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, description } = req.body;
+    const file = req.file;  
+    const food = await Foodmodel.findById(id);
+    if (!food) {
+      return res.status(404).json({ message: "Food item not found" });
+    }
+    // Update fields if provided
+    const updatedData = {
+        name: name || food.name,
+        price: price || food.price,
+        description: description || food.description
+    };  
+    // If new image is provided, upload and update
+    if (file) {
+      // Delete old image from Cloudinary       
+        if (food.image && food.image.publicId) {
+            await cloudinary.uploader.destroy(food.image.publicId);
+        }
+        const newImage = await uploadToCloudinary(file.buffer);
+        updatedData.image = {
+            url: newImage.secure_url,
+            publicId: newImage.public_id
+        };
+    }       
+    const updatedFood = await Foodmodel.findByIdAndUpdate(id, updatedData, { new: true });
+    res.status(200).json({
+      message: "Food item updated successfully",
+      data: updatedFood
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+// delete food item
+exports.deleteFood = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const food = await Foodmodel.findById(id);
+        if (!food) {
+            return res.status(404).json({ message: "Food item not found" });
+
+        }
+        // Delete image from Cloudinary
+        if (food.image && food.image.publicId) {
+            await cloudinary.uploader.destroy(food.image.publicId);
+        }
+        await Foodmodel.findByIdAndDelete(id);
+        res.status(200).json({
+            message: "Food item deleted successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
