@@ -10,7 +10,13 @@ const transactionRouter = require('./routes/transactionRouter');
 const port = process.env.PORT;
 const app = express();
 
-app.use(cors('*'));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://snap-break-fast-webapp-3f7nsa27q-zions-projects-73290082.vercel.app/"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
