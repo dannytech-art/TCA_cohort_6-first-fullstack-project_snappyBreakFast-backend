@@ -61,7 +61,17 @@ exports.getAllRestaurants = async (req, res) => {
 };
 exports.getRestaurantById = async (req, res) => {
     try {
-        
+        const {id} = req.params
+        const restaurant = await restaurantmodel.findById(id).populate('foodIds');
+        if (!restaurant) {
+            return res.status(404).json({
+                message: "Restaurant not found"
+            })
+        }
+        res.status(200).json({
+            message: "Restaurant fetched successfully",
+            data: restaurant
+        })
     } catch (error) {
         res.status(500).json({
             message: error.message
