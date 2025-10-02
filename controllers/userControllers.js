@@ -143,16 +143,8 @@ exports.signinotp = async (req, res) => {
     user.isLoggedIn = true;
     await user.save();
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
     res.status(200).json({
       message: "Signin successful",
-      data: user,
-      token
     });
     } catch (error) {
         res.status(500).json({ message: error.message });
