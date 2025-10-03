@@ -18,30 +18,26 @@ const uploadToCloudinary = (fileBuffer)=> {
         else resolve(result);
       }
     );
-    stream.end(fileBuffer); // send buffer
+    stream.end(fileBuffer);
   });
 }
-
-// Create a new food item   
+   
 exports.createFood = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price, description } = req.body;
     const file = req.file;
 
-    // 1. Check restaurant
     const restaurant = await resturantmodel.findById(id);
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    // 2. Check food name duplication
     const existingFood = await Foodmodel.findOne({ name });
     if (existingFood) {
       return res.status(400).json({ message: "Food item already exists" });
     }
 
-    // 3. Upload to Cloudinary directly from memory
     if (!file) {
       return res.status(400).json({ message: "Image is required" });
     }
@@ -52,7 +48,6 @@ exports.createFood = async (req, res) => {
       publicId: foodImage.public_id
     };
 
-    // 4. Create and save food
     const food = new Foodmodel({
       name,
       price,
@@ -119,13 +114,11 @@ exports.updateFood = async (req, res) => {
     if (!food) {
       return res.status(404).json({ message: "Food item not found" });
     }
-    // Update fields if provided
     const updatedData = {
         name: name || food.name,
         price: price || food.price,
         description: description || food.description
     };  
-    // If new image is provided, upload and update
     if (file) {
       // Delete old image from Cloudinary       
         if (food.image && food.image.publicId) {

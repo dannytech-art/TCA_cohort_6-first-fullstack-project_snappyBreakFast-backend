@@ -49,8 +49,7 @@ exports.signup = async (req,res)=> {
 
 exports.verifyOtp = async (req, res) => {
   try {
-    const { otp, email } = req.body; // email comes silently from frontend state
-
+    const { otp, email } = req.body; 
     if (!otp) {
       return res.status(400).json({ message: "OTP is required." });
     }
@@ -90,14 +89,13 @@ exports.resendOtp = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     if (user.isVerified) return res.status(400).json({ message: "User already verified" });
 
-    // Prevent spamming before expiry
     if (user.otp && user.otpExpiry > Date.now()) {
       return res.status(400).json({
         message: "You can only request a new OTP after the current one expires"
       });
     }
 
-    // 🔹 Generate new OTP & expiry
+    //  Generate new OTP & expiry
     const otp = String(Math.floor(100000 + Math.random() * 900000));
     const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
 
@@ -129,12 +127,10 @@ exports.signinotp = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // Check expiry
     if (user.otpExpiry < Date.now()) {
       return res.status(400).json({ message: "OTP has expired" });
     }
 
-    // Mark verified (if this is your login flow)
     user.isVerified = true;
     user.otp = null;
     user.otpExpiry = null;
